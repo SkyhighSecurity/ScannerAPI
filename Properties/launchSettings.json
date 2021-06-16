@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "MalwareScanner": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 32709,
+      "useSSL": false
+    },
+    "REST2ICAP": {
+      "commandName": "Project"
+    }
+  }
+}
