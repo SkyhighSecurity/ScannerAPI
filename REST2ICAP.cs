@@ -310,7 +310,6 @@ namespace icapscanner
                         {
                             result.Infected = false;  //Unmodified
                             result.HasError = false;
-                            result.ErrorMessage = "false flag set by responsemap";
                             return result;
                         }
 
