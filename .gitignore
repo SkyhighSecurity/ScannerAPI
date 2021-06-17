@@ -3,3 +3,7 @@
 ################################################################################
 
 /obj
+/bin/Release/netcoreapp3.1
+/.vs/rest2icap.github/v16
+/.vs/REST2ICAP/v16
+/.vs
