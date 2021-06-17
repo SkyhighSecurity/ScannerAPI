@@ -31,7 +31,7 @@ The API will return a JSON formatted result like this:
 
 # FAQ
 ### Why not just call the ICAP server directly?
-While ICAP is a standard defined by RFC 3507, it is not easy to use for modern applications due to its unique style of responses which are intended for display to end users. There are no standardized libraries for dealing with ICAP responses, so this would have to be written in to every application that needs anti-Malware/DLP functionality. Using this project allows developers to use a familiar REST API.
+While ICAP is a standard defined by RFC 3507, it is not easy to use for modern applications due to its unique style of responses which are intended for display to end users though a Web Gateway. There are no standardized libraries for dealing with ICAP responses, so this would have to be written in to every application that needs anti-Malware/DLP functionality. Using this project allows developers to use a familiar REST API.
 
 ### Can I use HTTPS?
 Since the caller and the API endpoint do not exchange the file directly (only the URL and result are exchange) there is no need for HTTPS for most use cases.  However, if you would still like to use HTTP, implemented reverse proxy or API gateway would be best practices.
