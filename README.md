@@ -14,7 +14,7 @@ For example:
 
 Note: The ICAPCLIENT variable is what IP/Host will be submitted to your ICAP server.
 
-## As an Azure function
+## Azure serverless function
 
 Simply copy REST2ICAP.cs into your Azure function and edit the ICAPServer, ICAPClient, and sICAPPort parameters for your configuration.
 
