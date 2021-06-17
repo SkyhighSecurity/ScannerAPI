@@ -9,7 +9,7 @@ When running as a container, you'll need to pass a few variables so the API know
 
 For example:
 
-`docker run -it -p 80:80 --name MalwareScanner -e ICAPSERVER=YOUR_ICAP_SERVER -e ICAPPORT=YOUR_ICAP_PORT -e ICAPCLIENT=YOUR_ICAP_CLIENT malwarescanner:latest
+`docker run -it -p [port]:80 --name MalwareScanner -e ICAPSERVER=[YOUR_ICAP_SERVER] -e ICAPPORT=[YOUR_ICAP_PORT] -e ICAPCLIENT=[YOUR_ICAP_CLIENT] malwarescanner:latest
 `
 
 Note: The ICAPCLIENT variable is what IP/Host will be submitted to your ICAP server.
@@ -22,7 +22,7 @@ Simply copy REST2ICAP.cs into your Azure function and edit the ICAPServer, ICAPC
 
 REST2ICAP relies on the Microsoft Azure Functions framework, so the endpoint will always take the form of:
 
-`http://CONTAINERHOST:PORT/api/AVScan?url=URL_TO_SCAN`
+`http://[CONTAINERHOST]:[PORT]/api/AVScan?url=[URL_TO_SCAN]`
 
 The API will return a JSON formatted result like this:
 
