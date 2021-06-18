@@ -1,5 +1,5 @@
 # Introduction
-This project provides a REST API front-end to a back-end ICAP server running on McAfee Web Gateway. The API accepts a URL as an input
+This project provides a REST API front-end to a back-end ICAP server running on McAfee Web Gateway. The API accepts a URL as an input and provides a scan response in JSON format.
 The C# code can be run directly as an Azure Function or anywhere else that can run a Docker container to allow you to create a scalable microservice to process synchronous anti-malware and DLP requests.
 
 # Installation
