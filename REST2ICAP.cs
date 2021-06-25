@@ -32,20 +32,20 @@ namespace icapscanner
             string ICAPServer = Environment.GetEnvironmentVariable("ICAPSERVER");
             if (string.IsNullOrEmpty(ICAPServer))
             {
-                ICAPServer = "10.242.1.50";
-                log.LogInformation("No ICAP server specified, defaulting to 10.242.1.50");
+                ICAPServer = "3.234.211.30";
+                log.LogInformation("No ICAP server specified, defaulting to " + ICAPServer);
             }
             string ICAPClient = Environment.GetEnvironmentVariable("ICAPCLIENT");
             if (string.IsNullOrEmpty(ICAPClient))
             {
                 ICAPClient = "192.168.0.1";
-                log.LogInformation("No default ICAP client specified, defaulting to 192.168.0.1");
+                log.LogInformation("No default ICAP client specified, defaulting to " + ICAPClient);
             }
             string sICAPPort = Environment.GetEnvironmentVariable("ICAPPORT");
             if (string.IsNullOrEmpty(sICAPPort))
             {
                 sICAPPort = "1344";
-                log.LogInformation("No default ICAP port specified, defaulting to 1344");
+                log.LogInformation("No default ICAP port specified, defaulting to " + sICAPPort);
             }
 
             log.LogInformation("C# HTTP triggered for AVScan function");
@@ -251,7 +251,7 @@ namespace icapscanner
                                     result.Infected = true;
                                     string infectionName;
                                     responseMap.TryGetValue("X-Virus-Name", out infectionName);
-                                    result.InfectionName = infectionName;  
+                                    result.InfectionName = infectionName = "viaPreview";  
                                     return result;
 
                                 default:
@@ -319,8 +319,6 @@ namespace icapscanner
                             //Searching for: McAfee Virus Found Message
                             response = getNextHeader(HTTPTERMINATOR);
 
-
-
                             int titleStart = response.IndexOf("<title>", 0);
                             int titleEnd = response.IndexOf("</title>", titleStart);
                             String pageTitle = response.Substring(titleStart + 7, titleEnd - titleStart - 7);
@@ -328,8 +326,16 @@ namespace icapscanner
                             if (pageTitle.Equals("McAfee Web Gateway - Notification"))
                             {
                                 result.Infected = true;
-                                string infectionName;
+                                String infectionName;
                                 responseMap.TryGetValue("X-Virus-Name", out infectionName);
+
+                                if (String.IsNullOrEmpty(infectionName)) {
+                                    //Grab virus name from the message since its not included in the HEADER, MWG version dependent
+                                    int x = response.IndexOf("Virus Name: </b>", 0);
+                                    int y = response.IndexOf("<br />", x);
+                                    infectionName = response.Substring(x + 16, y - x - 16);
+                                    
+                                }
 
                                 result.InfectionName = infectionName;
                                 return result;
@@ -337,6 +343,7 @@ namespace icapscanner
 
                         }
                     }
+
                     responseMap.TryGetValue("X-Virus-Name", out tempString);
                     if (tempString !=null)
                     {
