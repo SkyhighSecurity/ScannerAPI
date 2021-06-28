@@ -21,7 +21,7 @@ namespace icapscanner
         public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req, ILogger log)
         {
 
-            //Parse the request header for parameters
+            //Parse the request header for parameters 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             string urlToScan = req.Query["url"];
 
