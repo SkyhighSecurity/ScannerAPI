@@ -32,7 +32,7 @@ namespace icapscanner
             string ICAPServer = Environment.GetEnvironmentVariable("ICAPSERVER");
             if (string.IsNullOrEmpty(ICAPServer))
             {
-                ICAPServer = "3.234.211.30";
+                ICAPServer = "10.222.254.6";
                 log.LogInformation("No ICAP server specified, defaulting to " + ICAPServer);
             }
             string ICAPClient = Environment.GetEnvironmentVariable("ICAPCLIENT");
