@@ -6,14 +6,14 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
 WORKDIR /src
-COPY ["REST2ICAP.csproj", "."]
-RUN dotnet restore "./REST2ICAP.csproj"
+COPY ["ScannerAPI.csproj", "."]
+RUN dotnet restore "./ScannerAPI.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "REST2ICAP.csproj" -c Release -o /app/build
+RUN dotnet build "ScannerAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "REST2ICAP.csproj" -c Release -o /app/publish
+RUN dotnet publish "ScannerAPI.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /home/site/wwwroot
