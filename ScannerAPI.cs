@@ -469,5 +469,24 @@ namespace ScannerAPI
         }
     }
 
+    public static class MVCConnection
+        public bool authenticate(string username, string password, string bpsTenantid)
+        {
+            string iam_url = "https://iam.mcafee-cloud.com/iam/v1.1/token";  //hard coded
+            var request = (HttpWebRequest)WebRequest.Create(iam_url);
+            var webClient = new httpweb     
+       
+
+            string payload = "" +
+            "client_id: 0oae8q9q2y0IZOYUm0h7," + 
+            "grant_type: password," +
+            "username:" + username + "," +
+            "password:" + password + "," +
+            "scope: " + "shn.con.r web.adm.x web.rpt.x web.rpt.r web.lst.x web.plc.x web.xprt.x web.cnf.x uam:admin" + "," +
+            "tenant_id: " + bpsTenantid;
+
+
+            
+        }
 }
 
