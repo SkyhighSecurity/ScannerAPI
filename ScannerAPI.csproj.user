@@ -4,7 +4,7 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>Docker</ActiveDebugProfile>
+    <ActiveDebugProfile>MalwareScanner</ActiveDebugProfile>
     <_LastSelectedProfileId>C:\Users\nateb\Source\Repos\rest2icap.github\Properties\PublishProfiles\registry.hub.docker.com_terratrax.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
