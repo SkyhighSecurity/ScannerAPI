@@ -28,7 +28,7 @@ namespace ScannerAPI
             //Parse the request header for parameters
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             string urlToScan = req.Query["url"];
-            string s3uriString = req.Query["s3key"];
+            string s3uriString = req.Query["s3uri"];
 
             //To add/replace support for accepting a file directly, instead of pulling a blob pass the
             //file into a memory or file stream here
@@ -87,16 +87,18 @@ namespace ScannerAPI
                     Uri s3uri = new Uri(s3uriString);
 
                     s3GetRequest.BucketName = s3uri.Host;
-                    s3GetRequest.Key = s3uri.AbsolutePath;
-                                        
+
+
+                    char[] trimChars = { '/' };
+                    s3GetRequest.Key = s3uri.AbsolutePath.Trim(trimChars); //need to remove leading or trailing slashes
+
                     log.LogInformation("Got URI: " + s3uriString + ", bucket=" + s3uri.Host + "key=" + s3uri.AbsolutePath);
                     GetObjectResponse response = await s3Client.GetObjectAsync(s3GetRequest);
 
                     MemoryStream responseStream = new MemoryStream();
                     response.ResponseStream.CopyTo(responseStream);
 
-                    string fileName = Path.GetFileName(s3uriString);
-                    jsonScanResult ScanResult = icapper.scanFile(responseStream, fileName);
+                    jsonScanResult ScanResult = icapper.scanFile(responseStream, s3GetRequest.Key);  //scan the file
 
                     string jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
 
