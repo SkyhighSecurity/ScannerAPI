@@ -73,6 +73,10 @@ namespace ScannerAPI
                     string jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
 
                     log.LogInformation(jsonScanResultString);
+
+                    responseStream.Dispose();
+                    icapper.Dispose();
+
                     return new OkObjectResult(JsonConvert.SerializeObject(ScanResult));
                 }
                 else if (s3uriString != null)
@@ -88,18 +92,28 @@ namespace ScannerAPI
                     log.LogInformation("Got URI: " + s3uriString + ", bucket=" + s3uri.Host + "key=" + s3uri.AbsolutePath);
                     GetObjectResponse response = await s3Client.GetObjectAsync(s3GetRequest);
 
-                    MemoryStream responseStream = response.ResponseStream;
+                    MemoryStream responseStream = new MemoryStream();
+                    response.ResponseStream.CopyTo(responseStream);
 
-                    await s3Client.GetObjectAsync(s3GetRequest);
+                    string fileName = Path.GetFileName(s3uriString);
+                    jsonScanResult ScanResult = icapper.scanFile(responseStream, fileName);
 
-                    return new OkObjectResult("blah");
+                    string jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
+
+                    log.LogInformation(jsonScanResultString);
+
+                    responseStream.Dispose();
+                    s3Client.Dispose();
+                    icapper.Dispose();
+
+                    return new OkObjectResult(JsonConvert.SerializeObject(ScanResult));
                     
                 }
                 else
                 {
                     return new OkObjectResult("Error: Did not receive any targets to scan");
                 }
-
+                
             }
             catch (Exception ex)
             {
