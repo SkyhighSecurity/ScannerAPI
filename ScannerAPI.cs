@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net.Sockets;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace ScannerAPI
     {
@@ -24,6 +26,7 @@ namespace ScannerAPI
             //Parse the request header for parameters
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             string urlToScan = req.Query["url"];
+            string s3uriString = req.Query["s3key"];
 
             //To add/replace support for accepting a file directly, instead of pulling a blob pass the
             //file into a memory or file stream here
@@ -32,7 +35,7 @@ namespace ScannerAPI
             string ICAPServer = Environment.GetEnvironmentVariable("ICAPSERVER");
             if (string.IsNullOrEmpty(ICAPServer))
             {
-                ICAPServer = "10.222.254.6";
+                ICAPServer = "3.234.210.152";
                 log.LogInformation("No ICAP server specified, defaulting to " + ICAPServer);
             }
             string ICAPClient = Environment.GetEnvironmentVariable("ICAPCLIENT");
@@ -58,15 +61,42 @@ namespace ScannerAPI
             try
             {
 
-                MemoryStream responseStream = new MemoryStream(new WebClient().DownloadData(urlToScan));
-                string fileName = Path.GetFileName(urlToScan);
+                if (urlToScan != null)
+                {
+                    //if a URL is provided, use that first
+                    MemoryStream responseStream = new MemoryStream(new WebClient().DownloadData(urlToScan));
+                    string fileName = Path.GetFileName(urlToScan);
+                    jsonScanResult ScanResult = icapper.scanFile(responseStream, fileName);
 
-                jsonScanResult ScanResult = icapper.scanFile(responseStream, fileName);
+                    string jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
 
-                string jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
+                    log.LogInformation(jsonScanResultString);
+                    return new OkObjectResult(JsonConvert.SerializeObject(ScanResult));
+                }
+                else if (s3uriString != null)
+                {
+                    AmazonS3Client s3Client = new AmazonS3Client();
+                    GetObjectRequest s3GetRequest = new GetObjectRequest();
 
-                log.LogInformation(jsonScanResultString);
-                return new OkObjectResult(JsonConvert.SerializeObject(ScanResult));
+                    Uri s3uri = new Uri(s3uriString);
+
+                    s3GetRequest.BucketName = s3uri.Host;
+                    s3GetRequest.Key = s3uri.AbsolutePath;
+                                        
+                    log.LogInformation("Got URI: " + s3uriString + ", bucket=" + s3uri.Host + "key=" + s3uri.AbsolutePath);
+                    GetObjectResponse response = await s3Client.GetObjectAsync(s3GetRequest);
+
+                    MemoryStream responseStream = response.ResponseStream;
+
+                    await s3Client.GetObjectAsync(s3GetRequest);
+
+                    return new OkObjectResult("blah");
+                    
+                }
+                else
+                {
+                    return new OkObjectResult("Error: Did not receive any targets to scan");
+                }
 
             }
             catch (Exception ex)

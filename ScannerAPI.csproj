@@ -7,6 +7,7 @@
     <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.1.13" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.7" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
   </ItemGroup>
