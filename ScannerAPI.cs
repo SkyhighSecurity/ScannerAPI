@@ -81,6 +81,8 @@ namespace ScannerAPI
                 }
                 else if (s3uriString != null)
                 {
+                    //if S3 URI is provided, use that
+                    
                     AmazonS3Client s3Client = new AmazonS3Client();
                     GetObjectRequest s3GetRequest = new GetObjectRequest();
 
