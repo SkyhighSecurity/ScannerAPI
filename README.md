@@ -11,7 +11,7 @@ For example:
 
 `docker run -it -p [port]:80 --name MalwareScanner -e ICAPSERVER=[YOUR_ICAP_SERVER] -e ICAPPORT=[YOUR_ICAP_PORT] -e ICAPCLIENT=[YOUR_ICAP_CLIENT] terratrax/scannerapi:latest'
 
-Note: The ICAPCLIENT variable is what IP/Host will be submitted to your ICAP server (for logging purposes only).
+Note: The ICAPCLIENT variable is what IP/Host will be submitted to your ICAP server (for logging purposes only) which much be reachable from the container
 
 ## Azure serverless function
 
@@ -51,3 +51,6 @@ This is currently not implemented.  A more secure way to perform this function t
 
 ### How do I utilize the DLP / data classification function
 This is currently experimental and undocumented.
+
+### When running on Amazon ECS or other hosted container services the container stops immediately
+Specify the entry point "/azure-functions-host/Microsoft.Azure.WebJobs.Script.WebHost" in the your services container configuration.
