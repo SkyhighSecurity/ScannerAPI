@@ -31,7 +31,7 @@ Presently AVScan and DLPScan endpoints are supported.
 
 	Example for malware scanning an object in AWS S3:
 
-	'http://myhost:80/api/AVScan?uri=s3://mybucket/abc123.zip'
+	'http://myhost:80/api/AVScan?s3uri=s3://mybucket/abc123.zip'
 
 The API will return a JSON formatted result like this:
 
