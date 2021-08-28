@@ -35,7 +35,7 @@ Presently AVScan and DLPScan endpoints are supported.
 
 The API will return a JSON formatted result like this:
 
-`{"Filename":"putty-64bit-0.75-installer.msi","Infected":false,"InfectionName":null,"HasError":false,"ErrorMessage":"false flag set by responsemap"}`
+`{"Filename":"putty-64bit-0.75-installer.msi","Infected":false,"InfectionName":null,"HasError":false,"ErrorMessage":null}`
 
 Data classification is currently experimental / undocumented and you will need pass MVISION Cloud credentials and DLP policy ID as environent variables.
 
