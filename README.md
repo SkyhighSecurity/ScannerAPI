@@ -21,9 +21,11 @@ Simply copy ScannerAPI.cs into your Azure function and edit the ICAPServer, ICAP
 
 ScannerAPI relies on the Microsoft Azure Functions framework, so the endpoint will always take the form of:
 
-`http://[HOST]:[PORT]/api/[endpoint]?[url|s3uri]=[URL_OR_S3URI_TO_SCAN]`
+`http://[HOST]:[PORT]/api/[endpoint]?usefilecache=[True|False]&[url|s3uri]=[URL_OR_S3URI_TO_SCAN]`
 
-Presently AVScan and DLPScan endpoints are supported.
+Presently the AVScan endpoint is supported and the DLPScan endpoint is experimental.
+
+# Usage Examples
 
 	Example for malware scanning an http object:
 
@@ -32,6 +34,10 @@ Presently AVScan and DLPScan endpoints are supported.
 	Example for malware scanning an object in AWS S3:
 
 	'http://myhost:80/api/AVScan?s3uri=s3://mybucket/abc123.zip'
+
+	Scanning a large file?  Instruct the API to cache the file to disk instead of memory:
+
+	'http://myhost:80/api/AVScan?usefilecache=True&url=http://mystore.myco.com/files/abc123.zip'
 
 The API will return a JSON formatted result like this:
 

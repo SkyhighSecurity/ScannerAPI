@@ -29,6 +29,10 @@ namespace ScannerAPI
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             string urlToScan = req.Query["url"];
             string s3uriString = req.Query["s3uri"];
+            string useFileCache = req.Query["usefilecache"];
+
+            MemoryStream responseMemoryStream;
+            FileStream responseFileStream;
 
             //To add/replace support for accepting a file directly, instead of pulling a blob pass the
             //file into a memory or file stream here
@@ -53,10 +57,13 @@ namespace ScannerAPI
                 log.LogInformation("No default ICAP port specified, defaulting to " + sICAPPort);
             }
 
-            log.LogInformation("C# HTTP triggered for AVScan function");
-
+            log.LogInformation("C# HTTP triggered for AV Scan function");
+            log.LogInformation("  Scanning: " + urlToScan + s3uriString);           
+            
             string ICAPServiceName = "avscan";
             int ICAPPort = int.Parse(sICAPPort);
+            string jsonScanResultString;
+            jsonScanResult ScanResult;
 
             ICAPClient.ICAP icapper = new ICAPClient.ICAP(ICAPServer, ICAPPort, ICAPServiceName, ICAPClient);
 
@@ -66,15 +73,41 @@ namespace ScannerAPI
                 if (urlToScan != null)
                 {
                     //if a URL is provided, use that first
-                    MemoryStream responseStream = new MemoryStream(new WebClient().DownloadData(urlToScan));
+
                     string fileName = Path.GetFileName(urlToScan);
-                    jsonScanResult ScanResult = icapper.scanFile(responseStream, fileName);
 
-                    string jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
+                    if (useFileCache == bool.TrueString)  //Determine if we need to use a memory (default) or file stream to cache the file
+                    {
 
+                        //First download the file to temporary 
+                        string tempFileName = Path.GetTempFileName();
+                        log.LogInformation("  Using File Cache " + tempFileName);
+                        WebClient client = new WebClient();
+                        client.DownloadFile(urlToScan, tempFileName);
+                        client.Dispose();
+
+                        //Open temporary file to stream
+                        responseFileStream = new FileStream(tempFileName, FileMode.Open);
+                        ScanResult = icapper.scanStream(responseFileStream, fileName);
+                        jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
+
+                        responseFileStream.Close();
+                        responseFileStream.Dispose();
+                        File.Delete(tempFileName);
+
+                    }
+                    else
+                    {
+                        log.LogInformation("  Using Memory Cache");
+                        responseMemoryStream = new MemoryStream(new WebClient().DownloadData(urlToScan));
+                        ScanResult = icapper.scanStream(responseMemoryStream, fileName);
+                        jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
+
+                        responseMemoryStream.Dispose();
+                    }
+                                        
                     log.LogInformation(jsonScanResultString);
 
-                    responseStream.Dispose();
                     icapper.Dispose();
 
                     return new OkObjectResult(JsonConvert.SerializeObject(ScanResult));
@@ -87,22 +120,45 @@ namespace ScannerAPI
                     GetObjectRequest s3GetRequest = new GetObjectRequest();
 
                     Uri s3uri = new Uri(s3uriString);
-
+          
                     s3GetRequest.BucketName = s3uri.Host;
-
 
                     char[] trimChars = { '/' };
                     s3GetRequest.Key = s3uri.AbsolutePath.Trim(trimChars); //need to remove leading or trailing slashes
 
                     log.LogInformation("Got URI: " + s3uriString + ", bucket=" + s3uri.Host + "key=" + s3uri.AbsolutePath);
                     GetObjectResponse response = await s3Client.GetObjectAsync(s3GetRequest);
-
                     MemoryStream responseStream = new MemoryStream();
                     response.ResponseStream.CopyTo(responseStream);
 
-                    jsonScanResult ScanResult = icapper.scanFile(responseStream, s3GetRequest.Key);  //scan the file
 
-                    string jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
+                    if (useFileCache == bool.TrueString)  //Determine if we need to use a memory (default) or file stream to cache the file
+                    {
+                        string tempFileName = Path.GetTempFileName();
+                        log.LogInformation("  Using File Cache " + tempFileName);
+
+                        responseFileStream = new FileStream(tempFileName,FileMode.Create);
+                        response.ResponseStream.CopyTo(responseFileStream);
+
+                        ScanResult = icapper.scanStream(responseFileStream, s3GetRequest.Key);
+                        jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
+
+                        responseFileStream.Close();
+                        responseFileStream.Dispose();
+                        File.Delete(tempFileName);
+
+                    }
+                    else
+                    {
+                        log.LogInformation("  Using Memory Cache");
+                        responseMemoryStream = new MemoryStream(new WebClient().DownloadData(urlToScan));
+                        ScanResult = icapper.scanStream(responseMemoryStream, s3GetRequest.Key);
+                        jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
+
+                        responseMemoryStream.Dispose();
+                    }
+
+                    jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
 
                     log.LogInformation(jsonScanResultString);
 
@@ -162,56 +218,67 @@ namespace ScannerAPI
                 private byte[] buffer = new byte[4096];
                 private String tempString;
 
-                public ICAP(String serverIP, int port, String icapService, String clientIP, int previewSize = -1)
+                public ICAP(String serverHost, int port, String icapService, String clientIP, int previewSize = -1)
                 {
                     this.icapService = icapService;
-                    this.serverIP = serverIP;
                     this.port = port;
                     this.clientIP = clientIP;
-
                     //Initialize connection
-                    IPAddress ipAddress = IPAddress.Parse(serverIP);
-                    IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
-                    // Create a TCP/IP  socket.
-                    sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    sender.Connect(remoteEP);
-
-                    if (previewSize != -1)
+                    var iplist = System.Net.Dns.GetHostAddresses(serverHost);
+                    
+                    if (iplist.Length == 0)
                     {
-                        stdPreviewSize = previewSize;
+                        throw new ArgumentException("Unable to ICAP server address from specified host name.");
                     }
                     else
                     {
-                        String parseMe = getOptions();
-                        Dictionary<string, string> responseMap = parseHeader(parseMe);
+                        
+                        IPAddress ipAddress = iplist[0];
+                        this.serverIP = ipAddress.ToString();
+                        IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
-                        responseMap.TryGetValue("StatusCode", out tempString);
-                        if (tempString != null)
+                        // Create a TCP/IP  socket.
+                        sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                        sender.Connect(remoteEP);
+
+                        if (previewSize != -1)
                         {
-                            int status = Convert.ToInt16(tempString);
-
-                            switch (status)
-                            {
-                                case 200:
-                                    responseMap.TryGetValue("Preview", out tempString);
-                                    if (tempString != null)
-                                    {
-                                        stdPreviewSize = Convert.ToInt16(tempString);
-                                    }; break;
-                                default: throw new ICAPException("Could not get preview size from server");
-                            }
+                            stdPreviewSize = previewSize;
                         }
                         else
                         {
-                            throw new ICAPException("Could not get options from server");
+                            String parseMe = getOptions();
+                            Dictionary<string, string> responseMap = parseHeader(parseMe);
+
+                            responseMap.TryGetValue("StatusCode", out tempString);
+                            if (tempString != null)
+                            {
+                                int status = Convert.ToInt16(tempString);
+
+                                switch (status)
+                                {
+                                    case 200:
+                                        responseMap.TryGetValue("Preview", out tempString);
+                                        if (tempString != null)
+                                        {
+                                            stdPreviewSize = Convert.ToInt16(tempString);
+                                        }; break;
+                                    default: throw new ICAPException("Could not get preview size from server");
+                                }
+                            }
+                            else
+                            {
+                                throw new ICAPException("Could not get options from server");
+                            }
                         }
                     }
+
                 }
 
-                public jsonScanResult scanFile(MemoryStream memStream, string Filename)
+                public jsonScanResult scanStream(Stream byteStream, string Filename)
                 {
-                    int fileSize = (int)memStream.Length;
+                    int fileSize = (int)byteStream.Length;
 
                     byte[] requestHeader = Encoding.ASCII.GetBytes("GET http://" + clientIP + "/" + Filename + " HTTP/1.1" + "\r\n" + "Host: " + clientIP + "\r\n\r\n");
                     byte[] responseHeader = Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\n" + "Transfer-Encoding: chunked\r\n\r\n");
@@ -251,9 +318,9 @@ namespace ScannerAPI
 
                     byte[] chunk = new byte[previewSize]; //Send the preview chunk
 
-                    memStream.Seek(0, SeekOrigin.Begin);  //Reset the stream position to the beginning
+                    byteStream.Seek(0, SeekOrigin.Begin);  //Reset the stream position to the beginning
 
-                    memStream.Read(chunk, 0, previewSize);
+                    byteStream.Read(chunk, 0, previewSize);
                     sender.Send(chunk);
                     sender.Send(Encoding.ASCII.GetBytes("\r\n"));
 
@@ -324,7 +391,7 @@ namespace ScannerAPI
                         byte[] buffer = new byte[stdSendLength];
                         int n;
 
-                        while ((n = memStream.Read(buffer, 0, stdSendLength)) > 0)
+                        while ((n = byteStream.Read(buffer, 0, stdSendLength)) > 0)
                         {
                             offset += n;  // offset for next reading
                             if (n > stdSendLength)
@@ -345,7 +412,6 @@ namespace ScannerAPI
                         //Closing file transfer.
                         sender.Send(Encoding.ASCII.GetBytes("0\r\n\r\n"));
                     }
-                    //fileStream.Close();
 
                     responseMap.Clear();
                     String response = getNextHeader(ICAPTERMINATOR);
@@ -666,7 +732,7 @@ namespace ScannerAPI
             string policyid = "520065"; //TODO: get form env variable
 
             MemoryStream responseStream;
-
+            
             if (conn.isAuthenticated())
             {
                 log.LogInformation("Already authenticated...");
@@ -684,6 +750,7 @@ namespace ScannerAPI
             try //Fetch file and DLP API Request
             {
                 responseStream = new MemoryStream(new WebClient().DownloadData(urlToScan));
+
                 log.LogInformation("Sucessfully fetched " + fileName);
 
                 HttpClient mvc_client = new HttpClient();
