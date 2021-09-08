@@ -1,0 +1,20 @@
+{
+  "Records": [
+    {
+      "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
+      "receiptHandle": "MessageReceiptHandle",
+      "body":  "{\"Records\":[{\"eventVersion\":\"2.1\",\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-2\",\"eventTime\":\"2021-09-06T00:14:09.336Z\",\"eventName\":\"ObjectCreated:Copy\",\"userIdentity\":{\"principalId\":\"AWS:AIDASQ7JCK5C24NKYYJA5\"},\"requestParameters\":{\"sourceIPAddress\":\"14.202.22.33\"},\"responseElements\":{\"x-amz-request-id\":\"3GP62PZ2NEBP647R\",\"x-amz-id-2\":\"apV74vomHNfHkEe2g5AGOCcwQA4jj7ryPZWDHFM7eb5kJMu762Fk4nYeTaHWZeQRNm0ebIae5MI4l/Y9tvMvcEmjiZEy1KraK7e+dX0fjWA=\"},\"s3\":{\"s3SchemaVersion\":\"1.0\",\"configurationId\":\"FileUploaded\",\"bucket\":{\"name\":\"agency-a-bucket\",\"ownerIdentity\":{\"principalId\":\"A1GZDEY2770U2R\"},\"arn\":\"arn:aws:s3:::agency-a-bucket\"},\"object\":{\"key\":\"vegetationcentwestlachlansvm4468.zip\",\"size\":1274738,\"eTag\":\"96a1f02b10c5711a4994ca44cf358844\",\"sequencer\":\"0061355D57ED9232B9\"}}}]}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1523232000000",
+        "SenderId": "123456789012",
+        "ApproximateFirstReceiveTimestamp": "1523232000001"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "ee13fe0e572f6f2181e59877dbfe2dcc",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:ap-southeast-2:173898094405:FileUploaded",
+      "awsRegion": "ap-southeast-2"
+    }
+  ]
+}
