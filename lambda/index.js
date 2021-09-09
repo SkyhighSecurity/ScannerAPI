@@ -77,9 +77,9 @@ function handleRecord(s3, record, callback) {
 
     async.auto({
         scan: function(callback) {
-            console.log('get http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + file;
+            console.log('get http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + file);
             superagent
-                .get('http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + file
+                .get('http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + file)
                 .set('Accept', 'application/json')
                 .then(res => {
                     console.log(`statusCode: ${res.status}`, res.body);
@@ -203,7 +203,7 @@ function handleRecord(s3, record, callback) {
             console.log('tag?');
             if (!data.scan || data.infected) {
                 console.log('nope!');
-                return callback(null); // don't tag if we are deleting it
+                return callback(null, false); // don't tag if we are deleting it
             }
 
             const failed = (data.infected === null);
@@ -234,11 +234,11 @@ function handleRecord(s3, record, callback) {
                 .promise()
                 .then(function(data) {
                     console.log('tagging complete', data);
-                    callback(null);
+                    callback(null, true);
                 })
                 .catch(function(err) {
                     console.error(err);
-                    return callback(err);
+                    return callback(err, false);
                 });
 
         }],
@@ -247,7 +247,7 @@ function handleRecord(s3, record, callback) {
             console.log('delete?');
             if (!data.scan || !data.infected) {
                 console.log('nope!');
-                return callback(null);
+                return callback(null, false);
             }
 
             const infection = data.scan.body.InfectionName || '<unknown>';
@@ -279,7 +279,7 @@ function handleRecord(s3, record, callback) {
             console.log('notify?');
             if (!data.deleted) {
                 console.log('nope!');
-                return callback(null);
+                return callback(null, false);
             }
 
             const infection = data.scan.body.InfectionName || '<unknown>';
@@ -287,11 +287,11 @@ function handleRecord(s3, record, callback) {
             console.log('deleted file ', bucket, file, ' infected with ', infection);
 
             if (!notifyTopicARN) {
-                return callback(error);
+                return callback(null, false);
             }
 
             const params = {
-                Message: `Could not scan ${bucket} / ${file} : ${error.message}`,
+                Message: `Deleted ${bucket}/${file} infected with ${infection}`,
                 TopicArn: notifyTopicARN
             };
 
@@ -302,10 +302,10 @@ function handleRecord(s3, record, callback) {
             publishTextPromise.then(function(data) {
                 console.log(`Message ${params.Message} sent to the topic ${params.TopicArn}`);
                 console.log("MessageID is " + data.MessageId);
-                callback(null);
+                callback(null, true);
             }).catch(function(err) {
                 console.error(err, err.stack);
-                callback(null);
+                callback(null, false);
             });
 
         }]
