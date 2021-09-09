@@ -66,20 +66,22 @@ function handleRecord(s3, record, callback) {
     //console.log(s3.bucket);
 
     const bucket = s3record.bucket && s3record.bucket.name; //&& decodeURIComponent(s3record.bucket.name.replace(/\+/g, ' '));
+    var rawFile = null;
     var file = null;
     // stupid aws puts "object" as a key! DOH!
     for (const [key, value] of Object.entries(s3record)) {
         if (key === 'object') {
-            file = value.key; // && decodeURIComponent(value.key.replace(/\+/g, ' '));
+            rawFile = value.key;
+            file = decodeURIComponent(rawFile.replace(/\+/g, ' '));
         }
     }
     if (!bucket || !file) { return callback(null); } // silent failure
 
     async.auto({
         scan: function(callback) {
-            console.log('get http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + file);
+            console.log('get http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + rawFile);
             superagent
-                .get('http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + file)
+                .get('http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + rawFile)
                 .set('Accept', 'application/json')
                 .then(res => {
                     console.log(`statusCode: ${res.status}`, res.body);
