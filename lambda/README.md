@@ -35,14 +35,14 @@ Refer to AWS documentation on how to set up the SQS queue to trigger this functi
 Once installed, as the lambda function requires access to S3 to read/write (delete and tag) you need to set environment variables on the lambda function
 Optionally, if you want to receive notifications for Deletions and Errors, set the NotifyTopicARN environment variable.
 
-| - | - | - |
+
 | Environment Variable | Mandatory? | Description |
 | - | - | - |
 | S3Key | Y | Key for IAM user with write access to S3 |
 | S3Secret | Y | Secret for IAM user with write access to S3 |
 | ScannerAPI | Y | IP Address for ScannerAPI container |
 | NotifyTopicARN | N | ARN for SNS notification topic |
-| - | - | - |
+
 
 ## VPC and Endpoints
 
