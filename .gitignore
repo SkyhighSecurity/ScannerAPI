@@ -7,3 +7,8 @@
 /.vs/rest2icap.github/v16
 /.vs/REST2ICAP/v16
 /.vs
+
+
+**/.DS_Store
+**/bucket-name.txt
+**/.idea
