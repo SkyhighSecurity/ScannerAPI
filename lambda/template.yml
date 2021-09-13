@@ -1,0 +1,20 @@
+﻿AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Lambda application that submits files to McAfee Web Gateway.
+Resources:
+  function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.sqsPayloadLoggerHandler
+      Runtime: nodejs14.x
+      Description: Submit files to ScannerAPI
+      MemorySize: 256
+      Timeout: 9
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambda_ReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+        - AmazonEC2FullAccess
+        - AmazonS3FullAccess
+      Tracing: Active
