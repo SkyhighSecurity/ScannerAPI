@@ -133,6 +133,7 @@ namespace ScannerAPI
 
 
                     if (useFileCache == bool.TrueString)  //Determine if we need to use a memory (default) or file stream to cache the file
+                        //Debug: Not working with S3URI need to move s3 get rewuests to below
                     {
                         string tempFileName = Path.GetTempFileName();
                         log.LogInformation("  Using File Cache " + tempFileName);
