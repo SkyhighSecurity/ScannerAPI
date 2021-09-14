@@ -35,7 +35,7 @@ Presently the AVScan endpoint is supported and the DLPScan endpoint is experimen
 
 	'http://myhost:80/api/AVScan?s3uri=s3://mybucket/abc123.zip'
 
-	Scanning a large file?  Instruct the API to cache the file to disk instead of memory:
+	Scanning a large file?  Instruct the API to cache the file to disk instead of memory by passing usefilecache=True (case sensitive):
 
 	'http://myhost:80/api/AVScan?usefilecache=True&url=http://mystore.myco.com/files/abc123.zip'
 
@@ -60,3 +60,6 @@ This is currently experimental and undocumented.
 
 ### When running on Amazon ECS or other hosted container services the container stops immediately
 Specify the entry point "/azure-functions-host/Microsoft.Azure.WebJobs.Script.WebHost" in the your services container configuration.
+
+### How I write temporary files (when scans specify usediskcache=True) to storage outside the container
+Use a volume so that the containers /tmp directory references an external volume.

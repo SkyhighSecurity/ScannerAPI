@@ -118,7 +118,7 @@ namespace ScannerAPI
 
                     string fileName = Path.GetFileName(s3uriString);
 
-                    AmazonS3Client s3Client = new AmazonS3Client(Amazon.RegionEndpoint.USEast1);
+                    AmazonS3Client s3Client = new AmazonS3Client();
                     GetObjectRequest s3GetRequest = new GetObjectRequest();
 
                     Uri s3uri = new Uri(s3uriString);
@@ -129,7 +129,7 @@ namespace ScannerAPI
                     s3GetRequest.Key = s3uri.AbsolutePath.Trim(trimChars); //need to remove leading or trailing slashes
 
                     log.LogInformation("Got URI: " + s3uriString + ", bucket=" + s3uri.Host + "key=" + s3uri.AbsolutePath);
-                    GetObjectResponse response = await s3Client.GetObjectAsync(s3GetRequest);
+                    
 
                     if (useFileCache == bool.TrueString)  //Scan S3 URI using File Cache
                     {
@@ -142,7 +142,7 @@ namespace ScannerAPI
                         fs.Close();
 
                         Amazon.S3.Transfer.TransferUtility ftu = new Amazon.S3.Transfer.TransferUtility(s3Client);
-                        ftu.Download(tempFileName, s3uri.Host, s3uri.AbsolutePath);
+                        ftu.Download(tempFileName, s3uri.Host, s3uri.AbsolutePath.Trim(trimChars));
 
                         responseFileStream = new FileStream(tempFileName, FileMode.Open);
                         ScanResult = icapper.scanStream(responseFileStream, s3GetRequest.Key);
@@ -156,10 +156,12 @@ namespace ScannerAPI
                     else //Scan S3 URI using Memory Cache
                     {
                         log.LogInformation("  Using Memory Cache");
+
+                        GetObjectResponse response = await s3Client.GetObjectAsync(s3GetRequest);
                         MemoryStream responseStream = new MemoryStream();
                         response.ResponseStream.CopyTo(responseStream); //TODO: DELETE THIS COPY IF IT WORKS WITHOUT
                         //response.Dispose();
-                        ScanResult = icapper.scanStream(response.ResponseStream, s3GetRequest.Key);
+                        ScanResult = icapper.scanStream(responseStream, s3GetRequest.Key);
                         jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
 
                         responseStream.Dispose();
