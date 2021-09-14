@@ -1,16 +1,14 @@
 {
   "profiles": {
     "MalwareScanner": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "hotReloadEnabled": false
     },
     "Docker": {
       "commandName": "Docker",
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "httpPort": 32709,
       "useSSL": false
-    },
-    "REST2ICAP": {
-      "commandName": "Project"
     }
   }
 }
