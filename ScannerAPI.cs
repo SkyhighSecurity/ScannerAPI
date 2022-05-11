@@ -128,9 +128,8 @@ namespace ScannerAPI
                     char[] trimChars = { '/' };
                     s3GetRequest.Key = s3uri.AbsolutePath.Trim(trimChars); //need to remove leading or trailing slashes
 
-                    log.LogInformation("Got URI: " + s3uriString + ", bucket=" + s3uri.Host + "key=" + s3uri.AbsolutePath);
+                    log.LogInformation("Got URI: " + s3uriString + ", bucket=" + s3uri.Host + ", key=" + s3uri.AbsolutePath.Trim(trimChars));
                     
-
                     if (useFileCache == bool.TrueString)  //Scan S3 URI using File Cache
                     {
 
