@@ -126,7 +126,7 @@ namespace ScannerAPI
                     s3GetRequest.BucketName = s3uri.Host;
 
                     char[] trimChars = { '/' };
-                    s3GetRequest.Key = s3uri.AbsolutePath.Trim(trimChars); //need to remove leading or trailing slashes
+                    s3GetRequest.Key = System.Net.WebUtility.UrlDecode(s3uri.AbsolutePath.Trim(trimChars)); //need to remove leading or trailing slashes
 
                     log.LogInformation("Got URI: " + s3uriString + ", bucket=" + s3uri.Host + ", key=" + s3uri.AbsolutePath.Trim(trimChars));
                     
