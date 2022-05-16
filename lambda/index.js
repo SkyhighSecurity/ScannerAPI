@@ -79,9 +79,9 @@ function handleRecord(s3, record, callback) {
 
     async.auto({
         scan: function(callback) {
-            console.log('get http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + rawFile);
+            console.log('get http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + encodeURIComponent(rawFile));
             superagent
-                .get('http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + rawFile)
+                .get('http://' + scanServer + '/api/AVScan?usefilecache=True&s3uri=s3://' + bucket + '/' + encodeURIComponent(rawFile))
                 .set('Accept', 'application/json')
                 .then(res => {
                     console.log(`statusCode: ${res.status}`, res.body);
