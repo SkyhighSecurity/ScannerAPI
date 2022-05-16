@@ -69,6 +69,9 @@ function. Modify this to provide the s3 bucket and key (other fields are ignored
 ./3-test.sh
 ```
 
+![icap-scan](https://user-images.githubusercontent.com/44593913/168502139-fbe534e8-4402-4f4a-aaed-ccd0c955191b.gif)
+
+
 # Decommissioning
 
 If you want to tear down the lambda function and remove the s3 bucket for lambda artifacts use this script:
