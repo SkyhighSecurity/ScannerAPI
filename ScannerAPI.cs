@@ -144,7 +144,7 @@ namespace ScannerAPI
                         ftu.Download(tempFileName, s3uri.Host, s3uri.AbsolutePath.Trim(trimChars));
 
                         responseFileStream = new FileStream(tempFileName, FileMode.Open);
-                        ScanResult = icapper.scanStream(responseFileStream, s3GetRequest.Key);
+                        ScanResult = icapper.scanStream(responseFileStream, System.Net.WebUtility.UrlDecode(s3GetRequest.Key));
                         jsonScanResultString = JsonConvert.SerializeObject(ScanResult);
 
                         responseFileStream.Close();
