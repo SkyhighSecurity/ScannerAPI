@@ -1,5 +1,5 @@
 # Introduction
-This project provides a REST API front-end to McAfee anti-malware and data classification services provided by McAfee Web Gateway (antimalware) and MVISION Cloud (data classification). The API accepts a URL or S3 UTI as an input and provides a scan response in JSON format.
+This project provides a REST API front-end to McAfee anti-malware and data classification services provided by Skyhigh Web Gateway (antimalware) and Skyhigh Cloud (data classification). The API accepts a URL or S3 UTI as an input and provides a scan response in JSON format.
 The C# code can be run directly as an Azure Function or anywhere else that can run a Docker container to provide a scalable microservice that processes synchronous anti-malware and classification/DLP requests.
 
 # Installation
@@ -43,7 +43,7 @@ The API will return a JSON formatted result like this:
 
 `{"Filename":"putty-64bit-0.75-installer.msi","Infected":false,"InfectionName":null,"HasError":false,"ErrorMessage":null}`
 
-Data classification is currently experimental / undocumented and you will need pass MVISION Cloud credentials and DLP policy ID as environent variables.
+Data classification is currently experimental / undocumented and you will need pass Skyhigh Cloud credentials and DLP policy ID as environent variables.
 
 # FAQ
 ### Why not just call the ICAP server directly?
