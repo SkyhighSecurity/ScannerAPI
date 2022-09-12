@@ -1,5 +1,5 @@
 # Introduction
-This project provides a REST API front-end to McAfee anti-malware and data classification services provided by Skyhigh Web Gateway (antimalware) and Skyhigh Cloud (data classification). The API accepts a URL or S3 UTI as an input and provides a scan response in JSON format.
+This project provides a REST API front-end to Skyhigh anti-malware and data classification services provided by Skyhigh Web Gateway (antimalware) and Skyhigh Cloud (data classification). The API accepts a URL or S3 UTI as an input and provides a scan response in JSON format.
 The C# code can be run directly as an Azure Function or anywhere else that can run a Docker container to provide a scalable microservice that processes synchronous anti-malware and classification/DLP requests.
 
 # Installation
