@@ -55,11 +55,14 @@ Since the caller and the API endpoint do not exchange the file directly (only th
 ### Can I submit a file directly via HTTP stream?
 This is currently not implemented.  A more secure way to perform this function that avoids the need for a reverse proxy would be to initially save the file to blob storage, generate a pre-signed URL (or SAS token) for the file, and submit that URL to the API for scanning.  If you have a use case to submit the file directly please contact the project team and we can consider adding it.
 
+### Can I use this to scan files in an S3 bucket?
+Yes, this is a common use case.  The general strategy is to use something like AWS Lambda to call the API as files are added to an S3 bucket.  An example which sorts files into "clean" and "dirty" buckets is available in the [LambdaMalwareSorterS3 project](https://github.com/terratrax/LambdaMalwareSorterS3).
+
 ### How do I utilize the DLP / data classification function
 This is currently experimental and undocumented.
 
 ### When running on Amazon ECS or other hosted container services the container stops immediately
 Specify the entry point "/azure-functions-host/Microsoft.Azure.WebJobs.Script.WebHost" in the your services container configuration.
 
-### How I write temporary files (when scans specify usediskcache=True) to storage outside the container
+### How can I write temporary files (when scans specify usediskcache=True) to storage outside the container
 Use a volume so that the containers /tmp directory references an external volume.
