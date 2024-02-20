@@ -9,7 +9,7 @@ When running as a container, you'll need to pass a few variables so the API know
 
 For example:
 
-`docker run -it -p [port]:80 --name MalwareScanner -e ICAPSERVER=[YOUR_ICAP_SERVER] -e ICAPPORT=[YOUR_ICAP_PORT] -e ICAPCLIENT=[YOUR_ICAP_CLIENT] terratrax/scannerapi:latest'
+`docker run -it -p [port]:80 --name MalwareScanner -e ICAPSERVER=[YOUR_ICAP_SERVER] -e ICAPPORT=[YOUR_ICAP_PORT] -e ICAPCLIENT=[YOUR_ICAP_CLIENT] skyhighsecurity/scannerapi:latest'
 
 Note: The ICAPCLIENT variable is what IP/Host will be submitted to your ICAP server (for logging purposes only) which much be reachable from the container
 
